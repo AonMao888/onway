@@ -1,7 +1,7 @@
 const express = require('express');
 var admin = require('firebase-admin');
 const cors = require('cors');
-var serviceAccount = require('./onway-700f9-firebase-adminsdk-fbsvc-3d9ca579f3.json')
+var serviceAccount = require('./onway.json')
 
 const app = express();
 app.use(express.json());
