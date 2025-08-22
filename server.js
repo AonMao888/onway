@@ -1,7 +1,7 @@
 const express = require('express');
+var admin = require('firebase-admin');
 const cors = require('cors');
-const admin = require('firebase-admin');
-const adminfile = require('./admin.json');
+var serviceAccount = require('./onway-700f9-firebase-adminsdk-fbsvc-3d9ca579f3.json')
 
 const app = express();
 app.use(express.json());
@@ -11,7 +11,7 @@ app.use(cors({
 }));
 
 admin.initializeApp({
-    credential: admin.credential.cert(adminfile)
+    credential: admin.credential.cert(serviceAccount)
 });
 const db = admin.firestore();
 
