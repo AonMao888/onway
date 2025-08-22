@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
-const adminfile = require('./firebase-adminsdk.json');
+const adminfile = require('./admin.json');
 
 const app = express();
 app.use(express.json());
@@ -15,6 +15,9 @@ admin.initializeApp({
 });
 const db = admin.firestore();
 
+app.get('/',(req,res)=>{
+    res.send('Home page')
+})
 //get all shop
 app.get('/allshop', (req, res) => {
     res.json({
