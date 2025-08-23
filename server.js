@@ -11,17 +11,17 @@ app.use(cors({
 }));
 
 var cer = {
-  "type": "service_account",
-  "project_id": process.env.PROJECTID,
-  "private_key_id": process.env.PRIVATEKEYID,
-  "private_key": process.env.PRIVATEKEY,
-  "client_email": process.env.CLIENTEMAIL,
-  "client_id": process.env.CLIENTID,
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": process.env.CLIENTCERT,
-  "universe_domain": "googleapis.com"
+    "type": "service_account",
+    "project_id": process.env.PROJECTID,
+    "private_key_id": process.env.PRIVATEKEYID,
+    "private_key": process.env.PRIVATEKEY,
+    "client_email": process.env.CLIENTEMAIL,
+    "client_id": process.env.CLIENTID,
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": process.env.CLIENTCERT,
+    "universe_domain": "googleapis.com"
 }
 
 admin.initializeApp({
@@ -29,7 +29,20 @@ admin.initializeApp({
 });
 const db = admin.firestore();
 
-app.get('/',(req,res)=>{
+function getdate(e) {
+    let jsdate = e.toDate();
+    const formattedDate = jsdate.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+    return formattedDate;
+}
+
+app.get('/', (req, res) => {
     res.send(process.env.HOMETEXT)
 })
 //get all shop
@@ -178,7 +191,7 @@ app.get('/order', async (req, res) => {
             text: "Error to get data!"
         })
     } else {
-        let all = g.docs.map(d => ({ id: d.id, ...d.data() }));
+        let all = g.docs.map(d => ({ id: d.id,ordertime:getdate(d.data().time), ...d.data() }));
         res.json({
             status: "success",
             text: "Order was got.",
@@ -331,6 +344,95 @@ app.get('/users', async (req, res) => {
         res.json({
             status: "success",
             text: "Users was got.",
+            data: all
+        })
+    }
+})
+
+//add counter holder
+app.post('/add/counterholder', async (req, res) => {
+    let data = req.body;
+    if (data) {
+        await db.collection('counterholders')
+            .add({
+                name: data.name,
+                email: data.email,
+                addedtime: admin.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                res.json({
+                    status: "success",
+                    text: "Counter holder was added."
+                })
+            }).catch(e => {
+                res.json({
+                    status: "fail",
+                    text: "Counter holder was unsuccessful to add."
+                })
+            })
+    }
+})
+
+//update counter holder
+app.post('/update/counterholder', async (req, res) => {
+    let data = req.body;
+    if (data) {
+        await db.collection('counterholders').doc(data.id)
+            .update({
+                name: data.name,
+                email: data.email,
+            }).then(() => {
+                res.json({
+                    status: "success",
+                    text: "Counter holder was updated."
+                })
+            }).catch(e => {
+                res.json({
+                    status: "fail",
+                    text: "Counter holder was unsuccessful to update."
+                })
+            })
+    }
+})
+
+//get counter holder
+app.get('/get/counterholder/:email', async (req, res) => {
+    let { email } = req.params;
+    if (email) {
+        let ll = await db.collection('counterholders').where('email', '==', email).get()
+        if (ll.empty) {
+            res.json({
+                status: "fail",
+                text: "No counter holder found!"
+            })
+        } else {
+            let cdata = ll.docs.map(i => ({ id: i.id, ...i.data() }));
+            res.json({
+                status: "success",
+                text: "Data found",
+                data:cdata
+            })
+        }
+    } else {
+        res.json({
+            status: "fail",
+            text: "Parameter required."
+        })
+    }
+})
+
+//get all counters
+app.get('/counters', async (req, res) => {
+    let g = await db.collection('counterholders').get();
+    if (g.empty) {
+        res.json({
+            status: "fail",
+            text: "Error to get data!"
+        })
+    } else {
+        let all = g.docs.map(d => ({ id: d.id, addtime: getdate(d.data().addedtime), ...d.data() }));
+        res.json({
+            status: "success",
+            text: "Counters was got.",
             data: all
         })
     }
