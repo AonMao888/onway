@@ -1,7 +1,7 @@
+require('dotenv').config()
 const express = require('express');
 var admin = require('firebase-admin');
 const cors = require('cors');
-require('dotenv').config()
 
 const app = express();
 app.use(express.json());
@@ -12,15 +12,15 @@ app.use(cors({
 
 var cer = {
   "type": "service_account",
-  "project_id": process.env.PROJECT_ID,
-  "private_key_id": process.env.PRIVATE_KEY_ID,
-  "private_key": process.env.PRIVATE_KEY,
-  "client_email": process.env.CLIENT_EMAIL,
-  "client_id": process.env.CLIENT_ID,
+  "project_id": process.env.PROJECTID,
+  "private_key_id": process.env.PRIVATEKEYID,
+  "private_key": process.env.PRIVATEKEY,
+  "client_email": process.env.CLIENTEMAIL,
+  "client_id": process.env.CLIENTID,
   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
   "token_uri": "https://oauth2.googleapis.com/token",
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": process.env.CLIENT_CERT,
+  "client_x509_cert_url": process.env.CLIENTCERT,
   "universe_domain": "googleapis.com"
 }
 
@@ -30,7 +30,7 @@ admin.initializeApp({
 const db = admin.firestore();
 
 app.get('/',(req,res)=>{
-    res.send('Home page')
+    res.send(process.env.HOMETEXT)
 })
 //get all shop
 app.get('/allshop', (req, res) => {
