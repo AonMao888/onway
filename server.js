@@ -205,7 +205,7 @@ app.get('/order/:id', async (req, res) => {
     let { id } = req.params;
     let got = await db.collection('order').doc(id).get();
     if (got.exists) {
-        let data = { id: got.id, ...got.data() }
+        let data = { id: got.id,ordertime:getdate(got.data().time), ...got.data() }
         res.json({
             status: "success",
             text: "Order found.",
