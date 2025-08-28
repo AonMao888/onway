@@ -516,7 +516,7 @@ app.get('/get/driver/:email', async (req, res) => {
                 text: "No driver found!"
             })
         } else {
-            let cdata = ll.docs.map(i => ({ id: i.id, ...i.data() }));
+            let cdata = ll.docs.map(i => ({ id: i.id,addtime:getdate(i.data().addedtime), ...i.data() }));
             res.json({
                 status: "success",
                 text: "Data found",
