@@ -191,7 +191,7 @@ app.get('/order', async (req, res) => {
             text: "Error to get data!"
         })
     } else {
-        let all = g.docs.map(d => ({ id: d.id,ordertime:getdate(d.data().time), ...d.data() }));
+        let all = g.docs.map(d => ({ id: d.id, ordertime: getdate(d.data().time), ...d.data() }));
         res.json({
             status: "success",
             text: "Order was got.",
@@ -205,7 +205,7 @@ app.get('/order/:id', async (req, res) => {
     let { id } = req.params;
     let got = await db.collection('order').doc(id).get();
     if (got.exists) {
-        let data = { id: got.id,ordertime:getdate(got.data().time), ...got.data() }
+        let data = { id: got.id, ordertime: getdate(got.data().time), ...got.data() }
         res.json({
             status: "success",
             text: "Order found.",
@@ -409,7 +409,7 @@ app.get('/get/counterholder/:email', async (req, res) => {
             res.json({
                 status: "success",
                 text: "Data found",
-                data:cdata
+                data: cdata
             })
         }
     } else {
@@ -434,6 +434,130 @@ app.get('/counters', async (req, res) => {
             status: "success",
             text: "Counters was got.",
             data: all
+        })
+    }
+})
+
+//get all drivers
+app.get('/drivers', async (req, res) => {
+    let g = await db.collection('drivers').get();
+    if (g.empty) {
+        res.json({
+            status: "fail",
+            text: "Error to get data!"
+        })
+    } else {
+        let all = g.docs.map(d => ({ id: d.id, addtime: getdate(d.data().addedtime), ...d.data() }));
+        res.json({
+            status: "success",
+            text: "Drivers was got.",
+            data: all
+        })
+    }
+})
+
+//add new driver
+app.post('/add/driver', async (req, res) => {
+    let data = req.body;
+    if (data) {
+        await db.collection('drivers')
+            .add({
+                name: data.name,
+                email: data.email,
+                addedtime: admin.firestore.FieldValue.serverTimestamp(),
+                address: data.address,
+                lat: '',
+                long: '',
+            }).then(() => {
+                res.json({
+                    status: "success",
+                    text: "New Driver was added."
+                })
+            }).catch(e => {
+                res.json({
+                    status: "fail",
+                    text: "New driver was unsuccessful to add."
+                })
+            })
+    }
+})
+
+//update driver
+app.post('/update/driver', async (req, res) => {
+    let data = req.body;
+    if (data) {
+        await db.collection('drivers').doc(data.id)
+            .update({
+                name: data.name,
+                email: data.email,
+                address: data.address
+            }).then(() => {
+                res.json({
+                    status: "success",
+                    text: "Driver was updated."
+                })
+            }).catch(e => {
+                res.json({
+                    status: "fail",
+                    text: "Driver was unsuccessful to update."
+                })
+            })
+    }
+})
+
+//get driver
+app.get('/get/driver/:email', async (req, res) => {
+    let { email } = req.params;
+    if (email) {
+        let ll = await db.collection('drivers').where('email', '==', email).get()
+        if (ll.empty) {
+            res.json({
+                status: "fail",
+                text: "No driver found!"
+            })
+        } else {
+            let cdata = ll.docs.map(i => ({ id: i.id, ...i.data() }));
+            res.json({
+                status: "success",
+                text: "Data found",
+                data: cdata
+            })
+        }
+    } else {
+        res.json({
+            status: "fail",
+            text: "Parameter required."
+        })
+    }
+})
+
+//get driver
+app.get('/update/driver/:email/location', async (req, res) => {
+    let { email } = req.params;
+    let { lat, long } = req.query;
+    if (email) {
+        let ll = await db.collection('drivers').where('email', '==', email).get()
+        if (ll.empty) {
+            res.json({
+                status: "fail",
+                text: "No driver found!"
+            })
+        } else {
+            let driverdoc = ll.docs[0];
+            await driverdoc.ref.update({
+                lat: lat,
+                long: long
+            }).then(() => {
+                res.json({
+                    status: "success",
+                    text: "Location updated.",
+                })
+            })
+        }
+    } else {
+        res.json({
+            status: "fail",
+            text: "Parameter required."
         })
     }
 })
