@@ -593,7 +593,7 @@ app.get('/info', async (req, res) => {
             text: "Error to get data!"
         })
     } else {
-        let all = g.docs.map(d => ({ id: d.id, addtime: getdate(d.data().addedtime), ...d.data() }));
+        let all = g.docs.map(d => ({ id: d.id, addtime: getdate(d.data().addtime), ...d.data() }));
         res.json({
             status: "success",
             text: "Data was got.",
