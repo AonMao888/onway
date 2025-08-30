@@ -565,10 +565,9 @@ app.get('/update/driver/:email/location', async (req, res) => {
 //update driver
 app.post('/info/add', async (req, res) => {
     let data = req.body;
-    let tempid = Math.floor(Math.random()*9999999999);
     if (data) {
-        await db.collection('info').doc(tempid)
-            .set({
+        await db.collection('info')
+            .add({
                 addtime:admin.firestore.FieldValue.serverTimestamp(),
                 ...data
             }).then(() => {
