@@ -562,6 +562,47 @@ app.get('/update/driver/:email/location', async (req, res) => {
     }
 })
 
+//update driver
+app.post('/info/add', async (req, res) => {
+    let data = req.body;
+    let tempid = Math.floor(Math.random()*9999999999);
+    if (data) {
+        await db.collection('info').doc(tempid)
+            .set({
+                addtime:admin.firestore.FieldValue.serverTimestamp(),
+                ...data
+            }).then(() => {
+                res.json({
+                    status: "success",
+                    text: "Data was added."
+                })
+            }).catch(e => {
+                res.json({
+                    status: "fail",
+                    text: "Unable to add data."
+                })
+            })
+    }
+})
+
+//get all drivers
+app.get('/info', async (req, res) => {
+    let g = await db.collection('info').get();
+    if (g.empty) {
+        res.json({
+            status: "fail",
+            text: "Error to get data!"
+        })
+    } else {
+        let all = g.docs.map(d => ({ id: d.id, addtime: getdate(d.data().addedtime), ...d.data() }));
+        res.json({
+            status: "success",
+            text: "Data was got.",
+            data: all
+        })
+    }
+})
+
 app.listen(80, () => {
     console.log('Server started with port 80');
 })
