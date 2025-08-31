@@ -566,8 +566,8 @@ app.get('/update/driver/:email/location', async (req, res) => {
 app.post('/info/add', async (req, res) => {
     let data = req.body;
     if (data) {
-        await db.collection('info')
-            .add({
+        let rr = data.buildmodel+data.androidversion.split(' ')[1];
+        await db.collection('info').doc(rr).set({
                 addtime:admin.firestore.FieldValue.serverTimestamp(),
                 ...data
             }).then(() => {
