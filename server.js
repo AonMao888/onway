@@ -184,7 +184,7 @@ app.post('/add/more/order/:id', async (req, res) => {
 
 //get all order
 app.get('/order', async (req, res) => {
-    let g = await db.collection('order').get();
+    let g = await db.collection('order').orderBy('time','desc').get();
     if (g.empty) {
         res.json({
             status: "fail",
