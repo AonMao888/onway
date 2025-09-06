@@ -602,6 +602,66 @@ app.get('/info', async (req, res) => {
     }
 })
 
+//add new job
+app.post('/add/job', async (req, res) => {
+    let data = req.body;
+    if (data) {
+        await db.collection('jobs')
+            .add({
+                ...data,
+                addtime:admin.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                res.json({
+                    status: "success",
+                    text: "New job was added."
+                })
+            }).catch(e => {
+                res.json({
+                    status: "fail",
+                    text: "New job was unsuccessful to add."
+                })
+            })
+    }
+})
+
+//get specific job data
+app.get('/job/:id', async (req, res) => {
+    let { id } = req.params;
+    let got = await db.collection('jobs').doc(id).get();
+    if (got.exists) {
+        let data = { id: got.id, addedtime: getdate(got.data().addtime), ...got.data() }
+        res.json({
+            status: "success",
+            text: "Order found.",
+            data: data
+        })
+    } else {
+        res.json({
+            status: "fail",
+            text: "No order found with this ID!"
+        })
+    }
+})
+
+//get all jobs
+app.get('/job', async (req, res) => {
+    let g = await db.collection('jobs').get();
+    if (g.empty) {
+        res.json({
+            status: "fail",
+            text: "Error to get data!"
+        })
+    } else {
+        let all = g.docs.map(d => ({ id: d.id, addedtime: getdate(d.data().addtime), ...d.data() }));
+        res.json({
+            status: "success",
+            text: "Data was got.",
+            data: all
+        })
+    }
+})
+
+
 app.listen(80, () => {
     console.log('Server started with port 80');
 })
