@@ -661,6 +661,69 @@ app.get('/job', async (req, res) => {
     }
 })
 
+//add new promotion code
+app.post('/add/promo', async (req, res) => {
+    let data = req.body;
+    if (data) {
+        await db.collection('promo')
+            .add({
+                ...data,
+                addtime:admin.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                res.json({
+                    status: "success",
+                    text: "New promotion code was added."
+                })
+            }).catch(e => {
+                res.json({
+                    status: "fail",
+                    text: "New promotion code was unsuccessful to add."
+                })
+            })
+    }
+})
+
+//update promotion code
+app.post('/update/promo', async (req, res) => {
+    let data = req.body;
+    if (data) {
+        await db.collection('promo').doc(data.id)
+            .update({
+                name: data.name,
+                expiry: data.expiry,
+                code: data.code
+            }).then(() => {
+                res.json({
+                    status: "success",
+                    text: "Promotion code was updated."
+                })
+            }).catch(e => {
+                res.json({
+                    status: "fail",
+                    text: "Promotion code was unsuccessful to update."
+                })
+            })
+    }
+})
+
+//get all promotion codes
+app.get('/promo', async (req, res) => {
+    let g = await db.collection('promo').get();
+    if (g.empty) {
+        res.json({
+            status: "fail",
+            text: "Error to get data!"
+        })
+    } else {
+        let all = g.docs.map(d => ({ id: d.id, addedtime: getdate(d.data().addtime), ...d.data() }));
+        res.json({
+            status: "success",
+            text: "Data was got.",
+            data: all
+        })
+    }
+})
+
 
 app.listen(80, () => {
     console.log('Server started with port 80');
