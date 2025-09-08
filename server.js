@@ -609,6 +609,7 @@ app.post('/add/job', async (req, res) => {
         await db.collection('jobs')
             .add({
                 ...data,
+                status:'Picked',
                 addtime:admin.firestore.FieldValue.serverTimestamp()
             }).then(() => {
                 res.json({
