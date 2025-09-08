@@ -184,7 +184,7 @@ app.post('/add/more/order/:id', async (req, res) => {
 
 //get all order
 app.get('/order', async (req, res) => {
-    let g = await db.collection('order').orderBy('time','desc').get();
+    let g = await db.collection('order').orderBy('time', 'desc').get();
     if (g.empty) {
         res.json({
             status: "fail",
@@ -243,12 +243,16 @@ app.post('/pick/order', async (req, res) => {
 app.post('/delivery/order', async (req, res) => {
     let data = req.body;
     if (data) {
-        await db.collection('order').doc(data.id).update({
+        await db.collection('order').doc(data.orderid).update({
             status: 'Delivered'
-        }).then(() => {
-            res.json({
-                status: "success",
-                text: "This order was delivered."
+        }).then(async () => {
+            await db.collection('jobs').doc(data.jobid).update({
+                status: 'Delivered'
+            }).then(() => {
+                res.json({
+                    status: "success",
+                    text: "This order was delivered."
+                })
             })
         })
     } else {
@@ -516,7 +520,7 @@ app.get('/get/driver/:email', async (req, res) => {
                 text: "No driver found!"
             })
         } else {
-            let cdata = ll.docs.map(i => ({ id: i.id,addtime:getdate(i.data().addedtime), ...i.data() }));
+            let cdata = ll.docs.map(i => ({ id: i.id, addtime: getdate(i.data().addedtime), ...i.data() }));
             res.json({
                 status: "success",
                 text: "Data found",
@@ -566,21 +570,21 @@ app.get('/update/driver/:email/location', async (req, res) => {
 app.post('/info/add', async (req, res) => {
     let data = req.body;
     if (data) {
-        let rr = data.buildmodel+data.androidversion.split(' ')[1];
+        let rr = data.buildmodel + data.androidversion.split(' ')[1];
         await db.collection('info').doc(rr).set({
-                addtime:admin.firestore.FieldValue.serverTimestamp(),
-                ...data
-            }).then(() => {
-                res.json({
-                    status: "success",
-                    text: "Data was added."
-                })
-            }).catch(e => {
-                res.json({
-                    status: "fail",
-                    text: "Unable to add data."
-                })
+            addtime: admin.firestore.FieldValue.serverTimestamp(),
+            ...data
+        }).then(() => {
+            res.json({
+                status: "success",
+                text: "Data was added."
             })
+        }).catch(e => {
+            res.json({
+                status: "fail",
+                text: "Unable to add data."
+            })
+        })
     }
 })
 
@@ -609,8 +613,8 @@ app.post('/add/job', async (req, res) => {
         await db.collection('jobs')
             .add({
                 ...data,
-                status:'Picked',
-                addtime:admin.firestore.FieldValue.serverTimestamp()
+                status: 'Picked',
+                addtime: admin.firestore.FieldValue.serverTimestamp()
             }).then(() => {
                 res.json({
                     status: "success",
@@ -669,7 +673,7 @@ app.post('/add/promo', async (req, res) => {
         await db.collection('promo')
             .add({
                 ...data,
-                addtime:admin.firestore.FieldValue.serverTimestamp()
+                addtime: admin.firestore.FieldValue.serverTimestamp()
             }).then(() => {
                 res.json({
                     status: "success",
