@@ -132,6 +132,9 @@ app.post('/add/order', async (req, res) => {
                 lat: data.lat,
                 long: data.long,
                 status: 'Received',
+                discount: data.discount,
+                discountname: data.discountname,
+                discountcode: data.discountcode,
                 time: admin.firestore.FieldValue.serverTimestamp(),
                 list: data.list
             }).then((e) => {
@@ -165,7 +168,10 @@ app.post('/add/more/order/:id', async (req, res) => {
                         lat: data.lat,
                         long: data.long,
                         note: data.note,
-                        address: data.useraddress
+                        address: data.useraddress,
+                        discount: data.discount,
+                        discountname: data.discountname,
+                        discountcode: data.discountcode,
                     }).then(() => {
                         res.json({
                             status: "success",
@@ -696,7 +702,7 @@ app.post('/update/promo', async (req, res) => {
             .update({
                 name: data.name,
                 expiry: data.expiry,
-                discount:data.discount,
+                discount: data.discount,
                 code: data.code
             }).then(() => {
                 res.json({
