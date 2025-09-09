@@ -696,6 +696,7 @@ app.post('/update/promo', async (req, res) => {
             .update({
                 name: data.name,
                 expiry: data.expiry,
+                discount:data.discount,
                 code: data.code
             }).then(() => {
                 res.json({
