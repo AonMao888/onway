@@ -78,7 +78,7 @@ app.post('/add/menu', async (req, res) => {
         await db.collection('menu')
             .add({
                 englishname: data.englishname,
-                chiname: data.chiname,
+                chinaname: data.chinaname,
                 tainame: data.tainame,
                 myanname: data.myanname,
                 type: data.type,
