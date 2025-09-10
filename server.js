@@ -736,6 +736,67 @@ app.get('/promo', async (req, res) => {
     }
 })
 
+//add menu type
+app.post('/add/menutype', async (req, res) => {
+    let data = req.body;
+    if (data) {
+        await db.collection('menutype')
+            .add({
+                name:data.name,
+                adddate:admin.firestore.FieldValue.serverTimestamp()
+            }).then((e) => {
+                res.json({
+                    status: "success",
+                    text: "Menu type was successfully added.",
+                    id: e.id
+                })
+            }).catch(e => {
+                res.json({
+                    status: "fail",
+                    text: "Something went wrong to add menu type"
+                })
+            })
+    }
+})
+
+//get all menu types
+app.get('/menutype', async (req, res) => {
+    let g = await db.collection('menutype').get();
+    if (g.empty) {
+        res.json({
+            status: "fail",
+            text: "Error to get data!"
+        })
+    } else {
+        let all = g.docs.map(d => ({ id: d.id, addedtime: getdate(d.data().adddate), ...d.data() }));
+        res.json({
+            status: "success",
+            text: "Data was got.",
+            data: all
+        })
+    }
+})
+
+//delete menu type
+app.post('/delete/menutype', async (req, res) => {
+    let data = req.body;
+    if (data) {
+        await db.collection('menutype').doc(data.id)
+        .delete().then((e) => {
+                res.json({
+                    status: "success",
+                    text: "Menu type was deleted.",
+                    id: e.id
+                })
+            }).catch(e => {
+                res.json({
+                    status: "fail",
+                    text: "Something went wrong to delete menu type"
+                })
+            })
+    }
+})
+
 
 app.listen(80, () => {
     console.log('Server started with port 80');
