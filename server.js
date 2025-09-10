@@ -817,6 +817,29 @@ app.post('/delete/menutype', async (req, res) => {
     }
 })
 
+//add push token
+app.post('/pushtoken', async (req, res) => {
+    let data = req.body;
+    if (data) {
+        await db.collection('pushtoken')
+            .add({
+                ...data,
+                adddate: admin.firestore.FieldValue.serverTimestamp()
+            }).then((e) => {
+                res.json({
+                    status: "success",
+                    text: "Push token was successfully added.",
+                    id: e.id
+                })
+            }).catch(e => {
+                res.json({
+                    status: "fail",
+                    text: "Something went wrong to add push token"
+                })
+            })
+    }
+})
+
 
 app.listen(80, () => {
     console.log('Server started with port 80');
