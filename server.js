@@ -821,8 +821,7 @@ app.post('/delete/menutype', async (req, res) => {
 app.post('/pushtoken', async (req, res) => {
     let data = req.body;
     if (data) {
-        await db.collection('pushtoken')
-            .add({
+        await db.collection('pushtoken').doc(data.uid).set({
                 ...data,
                 adddate: admin.firestore.FieldValue.serverTimestamp()
             }).then((e) => {
