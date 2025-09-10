@@ -249,6 +249,26 @@ app.post('/pick/order', async (req, res) => {
 app.post('/delivery/order', async (req, res) => {
     let data = req.body;
     if (data) {
+        await db.collection('order').doc(data.id).update({
+            status: 'Delivered'
+        }).then(() => {
+            res.json({
+                status: "success",
+                text: "This order was delivered."
+            })
+        })
+    } else {
+        res.json({
+            status: "fail",
+            text: "Error to pick order!"
+        })
+    }
+})
+
+//driver delivery to order
+app.post('/driver/delivery/order', async (req, res) => {
+    let data = req.body;
+    if (data) {
         await db.collection('order').doc(data.orderid).update({
             status: 'Delivered'
         }).then(async () => {
@@ -742,8 +762,8 @@ app.post('/add/menutype', async (req, res) => {
     if (data) {
         await db.collection('menutype')
             .add({
-                name:data.name,
-                adddate:admin.firestore.FieldValue.serverTimestamp()
+                name: data.name,
+                adddate: admin.firestore.FieldValue.serverTimestamp()
             }).then((e) => {
                 res.json({
                     status: "success",
@@ -782,7 +802,7 @@ app.post('/delete/menutype', async (req, res) => {
     let data = req.body;
     if (data) {
         await db.collection('menutype').doc(data.id)
-        .delete().then((e) => {
+            .delete().then((e) => {
                 res.json({
                     status: "success",
                     text: "Menu type was deleted.",
