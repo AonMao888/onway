@@ -499,6 +499,7 @@ app.post('/add/driver', async (req, res) => {
                 email: data.email,
                 addedtime: admin.firestore.FieldValue.serverTimestamp(),
                 address: data.address,
+                pushtoken: '',
                 lat: '',
                 long: '',
             }).then(() => {
@@ -825,19 +826,26 @@ app.post('/pushtoken', async (req, res) => {
     let data = req.body;
     if (data) {
         let got = await db.collection('drivers').where('email', '==', data.email).get();
-        await got.docs[0].ref.update({
-            pushtoken: data.token
-        }).then((e) => {
-            res.json({
-                status: "success",
-                text: "Push token was successfully added.",
-            })
-        }).catch(e => {
+        if (got.empty) {
             res.json({
                 status: "fail",
-                text: "Something went wrong to add push token"
+                text: "No driver found with this email.",
             })
-        })
+        } else {
+            await got.docs[0].ref.update({
+                pushtoken: data.token
+            }).then((e) => {
+                res.json({
+                    status: "success",
+                    text: "Push token was successfully added.",
+                })
+            }).catch(e => {
+                res.json({
+                    status: "fail",
+                    text: "Something went wrong to add push token"
+                })
+            })
+        }
     }
 })
 
