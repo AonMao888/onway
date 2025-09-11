@@ -2,6 +2,9 @@ require('dotenv').config()
 const express = require('express');
 var admin = require('firebase-admin');
 const cors = require('cors');
+const { Expo } = require('expo-server-sdk');
+
+const expo = new Expo();
 
 const app = express();
 app.use(express.json());
@@ -821,23 +824,42 @@ app.post('/delete/menutype', async (req, res) => {
 app.post('/pushtoken', async (req, res) => {
     let data = req.body;
     if (data) {
-        await db.collection('pushtoken').doc(data.uid).set({
-                ...data,
-                adddate: admin.firestore.FieldValue.serverTimestamp()
-            }).then((e) => {
-                res.json({
-                    status: "success",
-                    text: "Push token was successfully added.",
-                    id: e.id
-                })
-            }).catch(e => {
-                res.json({
-                    status: "fail",
-                    text: "Something went wrong to add push token"
-                })
+        let got = await db.collection('drivers').where('email', '==', data.email).get();
+        await got.docs[0].ref.update({
+            pushtoken: data.token
+        }).then((e) => {
+            res.json({
+                status: "success",
+                text: "Push token was successfully added.",
             })
+        }).catch(e => {
+            res.json({
+                status: "fail",
+                text: "Something went wrong to add push token"
+            })
+        })
     }
 })
+
+//push notification
+app.post("/push-notification", async (req, res) => {
+    const { token, title, body, metadata } = req.body;
+    if (!Expo.isExpoPushToken(token)) {
+        throw new Error("Invalid push token", 400);
+    }
+
+    const message = {
+        to: token,
+        sound: "default",
+        title: title,
+        body: body,
+        data: metadata || {},
+    };
+
+    const tickets = await expo.sendPushNotificationsAsync([message]);
+
+    return res.status(200).json(tickets);
+});
 
 
 app.listen(80, () => {
