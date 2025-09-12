@@ -698,6 +698,7 @@ app.post('/add/job', async (req, res) => {
                     })
                 })
             }).catch(e => {
+                console.log(e);
                 res.json({
                     status: "fail",
                     text: "New job was unsuccessful to add."
