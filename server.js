@@ -1,10 +1,8 @@
-require('dotenv').config()
+require('dotenv').config({debug:true});
 const express = require('express');
 var admin = require('firebase-admin');
 const cors = require('cors');
 const { Expo } = require('expo-server-sdk');
-
-const expo = new Expo();
 
 const app = express();
 app.use(express.json());
@@ -13,6 +11,7 @@ app.use(cors({
     origin: '*'
 }));
 
+const expo = new Expo();
 var cer = {
     "type": "service_account",
     "project_id": process.env.PROJECTID,
