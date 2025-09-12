@@ -662,7 +662,7 @@ app.post('/add/job', async (req, res) => {
                 addtime: admin.firestore.FieldValue.serverTimestamp()
             }).then(async () => {
                 const date = new Date();
-                let data = {
+                let notifydata = {
                     appId: 32071,
                     appToken: "w7YyAMdBOZYx3rKpFmlkXC",
                     title: "New Order",
@@ -671,8 +671,27 @@ app.post('/add/job', async (req, res) => {
                 };
                 await fetch('https://app.nativenotify.com/api/notification', {
                     method: 'POST',
-                    body: JSON.stringify(data)
-                }).then(r => r.json()).then(res => {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(notifydata)
+                }).then(r => r.json()).then(async () => {
+                    if (!Expo.isExpoPushToken(data.driver.pushtoken)) {
+                        throw new Error("Invalid push token", 400);
+                    }
+
+                    const message = {
+                        to: data.driver.pushtoken,
+                        sound: "default",
+                        title: 'New Order',
+                        body: 'New order to delivery was received.',
+                        data: {},
+                    };
+
+                    const tickets = await expo.sendPushNotificationsAsync([message]);
+
+                    return res.status(200).json(tickets);
+                }).then(res => {
                     res.json({
                         status: "success",
                         text: "New job was added."
