@@ -1,4 +1,4 @@
-require('dotenv').config({debug:true});
+require('dotenv').config({ debug: true });
 const express = require('express');
 var admin = require('firebase-admin');
 const cors = require('cors');
@@ -635,6 +635,22 @@ app.get('/info', async (req, res) => {
     }
 })
 
+function formatDateTime(date) {
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const year = date.getFullYear();
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+
+    const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+
+    return `${month}-${day}-${year} ${hours}:${formattedMinutes}${ampm}`;
+}
+
 //add new job
 app.post('/add/job', async (req, res) => {
     let data = req.body;
@@ -644,10 +660,23 @@ app.post('/add/job', async (req, res) => {
                 ...data,
                 status: 'Picked',
                 addtime: admin.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
-                res.json({
-                    status: "success",
-                    text: "New job was added."
+            }).then(async () => {
+                const date = new Date();
+                let data = {
+                    appId: 32071,
+                    appToken: "w7YyAMdBOZYx3rKpFmlkXC",
+                    title: "New Order",
+                    body: "New order to delivery was received.",
+                    dateSent: formatDateTime(date)
+                };
+                await fetch('https://app.nativenotify.com/api/notification', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                }).then(r => r.json()).then(res => {
+                    res.json({
+                        status: "success",
+                        text: "New job was added."
+                    })
                 })
             }).catch(e => {
                 res.json({
