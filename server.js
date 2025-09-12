@@ -454,7 +454,7 @@ app.get('/get/counterholder/:email', async (req, res) => {
 
 //get all counters
 app.get('/counters', async (req, res) => {
-    let g = await db.collection('counterholders').get();
+    let g = await db.collection('counterholders').orderBy('addedtime','desc').get();
     if (g.empty) {
         res.json({
             status: "fail",
@@ -472,7 +472,7 @@ app.get('/counters', async (req, res) => {
 
 //get all drivers
 app.get('/drivers', async (req, res) => {
-    let g = await db.collection('drivers').get();
+    let g = await db.collection('drivers').orderBy('addedtime','desc').get();
     if (g.empty) {
         res.json({
             status: "fail",
@@ -728,7 +728,7 @@ app.get('/job/:id', async (req, res) => {
 
 //get all jobs
 app.get('/job', async (req, res) => {
-    let g = await db.collection('jobs').get();
+    let g = await db.collection('jobs').orderBy('addtime', 'desc').get();
     if (g.empty) {
         res.json({
             status: "fail",
