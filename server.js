@@ -676,34 +676,22 @@ app.post('/add/job', async (req, res) => {
                 status: 'Picked',
                 addtime: admin.firestore.FieldValue.serverTimestamp()
             }).then(async () => {
-                if (!Expo.isExpoPushToken(data.driver.pushtoken)) {
-                    throw new Error("Invalid push token", 400);
-                }
-
-                const message = {
-                    to: data.driver.pushtoken,
-                    sound: "default",
-                    title: 'New Order',
-                    body: 'New order to delivery was received.',
-                    data: {},
-                };
-
-                const tickets = await expo.sendPushNotificationsAsync([message]);
-
-                return res.status(200).json(tickets);
-            }).then(res => {
                 res.json({
                     status: "success",
                     text: "New job was added."
                 })
+            }).catch(e => {
+                console.log(e);
+                res.json({
+                    status: "fail",
+                    text: "New job was unsuccessful to add."
+                })
             })
-    }).catch(e => {
-        console.log(e);
+    } else {
         res.json({
             status: "fail",
-            text: "New job was unsuccessful to add."
+            text: "Something went wrong!"
         })
-    })
     }
 })
 
