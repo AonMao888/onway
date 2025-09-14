@@ -454,7 +454,7 @@ app.get('/get/counterholder/:email', async (req, res) => {
 
 //get all counters
 app.get('/counters', async (req, res) => {
-    let g = await db.collection('counterholders').orderBy('addedtime','desc').get();
+    let g = await db.collection('counterholders').orderBy('addedtime', 'desc').get();
     if (g.empty) {
         res.json({
             status: "fail",
@@ -472,7 +472,7 @@ app.get('/counters', async (req, res) => {
 
 //get all drivers
 app.get('/drivers', async (req, res) => {
-    let g = await db.collection('drivers').orderBy('addedtime','desc').get();
+    let g = await db.collection('drivers').orderBy('addedtime', 'desc').get();
     if (g.empty) {
         res.json({
             status: "fail",
@@ -561,6 +561,21 @@ app.get('/get/driver/:email', async (req, res) => {
             status: "fail",
             text: "Parameter required."
         })
+    }
+})
+//get driver by raw
+app.get('/get/raw/driver/:email', async (req, res) => {
+    let { email } = req.params;
+    if (email) {
+        let ll = await db.collection('drivers').where('email', '==', email).get()
+        if (ll.empty) {
+            res.json([])
+        } else {
+            let cdata = ll.docs.map(i => ({ id: i.id, addtime: getdate(i.data().addedtime), ...i.data() }));
+            res.json(cdata)
+        }
+    } else {
+        res.json([])
     }
 })
 
@@ -743,6 +758,16 @@ app.get('/job', async (req, res) => {
         })
     }
 })
+//get raw job
+app.get('/raw/job', async (req, res) => {
+    let g = await db.collection('jobs').orderBy('addtime', 'desc').get();
+    if (g.empty) {
+        res.json([])
+    } else {
+        let all = g.docs.map(d => ({ id: d.id, addedtime: getdate(d.data().addtime), ...d.data() }));
+        res.json(all)
+    }
+})
 
 //add new promotion code
 app.post('/add/promo', async (req, res) => {
@@ -900,21 +925,27 @@ app.post('/pushtoken', async (req, res) => {
 //push notification
 app.post("/push-notification", async (req, res) => {
     const { token, title, body, metadata } = req.body;
-    if (!Expo.isExpoPushToken(token)) {
-        throw new Error("Invalid push token", 400);
+    // Basic validation
+    if (!token || !title || !body) {
+        return res.status(400).send("Missing required fields: token, title, or body.");
     }
-
+    if (!Expo.isExpoPushToken(token)) {
+        return res.status(400).send("Invalid push token.");
+    }
     const message = {
         to: token,
         sound: "default",
         title: title,
         body: body,
-        data: metadata || {},
+        data: { metadata }, // Pass the metadata as an object
     };
-
-    const tickets = await expo.sendPushNotificationsAsync([message]);
-
-    return res.status(200).json(tickets);
+    try {
+        const tickets = await expo.sendPushNotificationsAsync([message]);
+        return res.status(200).json(tickets);
+    } catch (error) {
+        console.error("Error sending push notification:", error);
+        return res.status(500).send("An unexpected error occurred.");
+    }
 });
 
 
