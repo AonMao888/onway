@@ -681,7 +681,10 @@ app.post('/add/job', async (req, res) => {
                         title:'New order...',
                         body:'New order was received.'
                     },
-                    token:data.driver.token,
+                    data:{
+                        customData:'new order'
+                    },
+                    token:data.driver.pushtoken,
                 };
                 try {
                     const response = await admin.messaging().send(message);
