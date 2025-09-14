@@ -677,27 +677,18 @@ app.post('/add/job', async (req, res) => {
                 addtime: admin.firestore.FieldValue.serverTimestamp()
             }).then(async () => {
                 const message = {
-                    notification:{
-                        title:'New order...',
-                        body:'New order was received.'
+                    notification: {
+                        title: 'New order...',
+                        body: 'New order was received.'
                     },
-                    data:{
-                        customData:'new order'
-                    },
-                    token:data.driver.pushtoken,
+                    token: data.driver.pushtoken,
                 };
                 try {
                     const response = await admin.messaging().send(message);
-                    res.json({
-                        status: "success",
-                        text: "New job was added.",
-                    })
+                    res.json({ status: "success", response });
                 } catch (error) {
-                    console.error("Error sending push notification:", error);
-                    res.json({
-                        status: "fail",
-                        text: error
-                    })
+                    console.error(error);
+                    res.status(500).json({ status: "error", text: error.message });
                 }
             }).catch(e => {
                 console.log(e);
@@ -940,6 +931,23 @@ app.post("/push-notification", async (req, res) => {
     }
 });
 
+app.get('/send', async (req, res) => {
+    let { token } = req.query;
+    const message = {
+        notification: {
+            title: 'New order...',
+            body: 'New order was received.'
+        },
+        token: token,
+    };
+    try {
+        const response = await admin.messaging().send(message);
+        res.json({ status: "success", response });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: "error", text: error.message });
+    }
+})
 
 app.listen(80, () => {
     console.log('Server started with port 80');
