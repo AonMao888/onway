@@ -685,7 +685,7 @@ app.post('/add/job', async (req, res) => {
                 };
                 try {
                     const response = await admin.messaging().send(message);
-                    res.json({ status: "success", response });
+                    res.json({ status: "success", text:"Job was sent to driver.", response });
                 } catch (error) {
                     console.error(error);
                     res.status(500).json({ status: "error", text: error.message });
