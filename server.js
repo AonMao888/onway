@@ -275,7 +275,8 @@ app.post('/driver/got/order', async (req, res) => {
             status: 'On going'
         }).then(async () => {
             await db.collection('jobs').doc(data.jobid).update({
-                status: 'On going'
+                status: 'On going',
+                'orderdata.status':'On going'
             }).then(() => {
                 res.json({
                     status: "success",
