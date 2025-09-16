@@ -267,6 +267,30 @@ app.post('/delivery/order', async (req, res) => {
     }
 })
 
+//driver got the order
+app.post('/driver/got/order', async (req, res) => {
+    let data = req.body;
+    if (data) {
+        await db.collection('order').doc(data.orderid).update({
+            status: 'On going'
+        }).then(async () => {
+            await db.collection('jobs').doc(data.jobid).update({
+                status: 'On going'
+            }).then(() => {
+                res.json({
+                    status: "success",
+                    text: "You got this order."
+                })
+            })
+        })
+    } else {
+        res.json({
+            status: "fail",
+            text: "Error to pick order!"
+        })
+    }
+})
+
 //driver delivery to order
 app.post('/driver/delivery/order', async (req, res) => {
     let data = req.body;
