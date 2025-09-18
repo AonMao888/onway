@@ -994,15 +994,15 @@ app.get('/send', async (req, res) => {
     }
 })
 
-//get counter holder
-app.get('/get/counterholder/:email', async (req, res) => {
+//check is admin
+app.get('/check/admin/:email', async (req, res) => {
     let { email } = req.params;
     if (email) {
-        let ll = await db.collection('counterholders').where('email', '==', email).get()
+        let ll = await db.collection('admin').where('email', '==', email).get()
         if (ll.empty) {
             res.json({
                 status: "fail",
-                text: "No counter holder found!"
+                text: "No account found!"
             })
         } else {
             let cdata = ll.docs.map(i => ({ id: i.id, ...i.data() }));
