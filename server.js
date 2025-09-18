@@ -267,6 +267,26 @@ app.post('/delivery/order', async (req, res) => {
     }
 })
 
+//set any order delivery fee
+app.post('/delivery/order/fee', async (req, res) => {
+    let data = req.body;
+    if (data) {
+        await db.collection('order').doc(data.id).update({
+            deliveryfee: data.deliveryfee
+        }).then(() => {
+            res.json({
+                status: "success",
+                text: "Order's delivery fee was set."
+            })
+        })
+    } else {
+        res.json({
+            status: "fail",
+            text: "Error to set delivery order fee!"
+        })
+    }
+})
+
 //driver got the order
 app.post('/driver/got/order', async (req, res) => {
     let data = req.body;
@@ -973,6 +993,33 @@ app.get('/send', async (req, res) => {
         res.status(500).json({ status: "error", text: error.message });
     }
 })
+
+//get counter holder
+app.get('/get/counterholder/:email', async (req, res) => {
+    let { email } = req.params;
+    if (email) {
+        let ll = await db.collection('counterholders').where('email', '==', email).get()
+        if (ll.empty) {
+            res.json({
+                status: "fail",
+                text: "No counter holder found!"
+            })
+        } else {
+            let cdata = ll.docs.map(i => ({ id: i.id, ...i.data() }));
+            res.json({
+                status: "success",
+                text: "Data found",
+                data: cdata
+            })
+        }
+    } else {
+        res.json({
+            status: "fail",
+            text: "Parameter required."
+        })
+    }
+})
+
 
 app.listen(80, () => {
     console.log('Server started with port 80');
