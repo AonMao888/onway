@@ -1037,6 +1037,64 @@ app.get('/check/admin/:email', async (req, res) => {
     }
 })
 
+//get all shop
+app.get('/shop', async (req, res) => {
+    let g = await db.collection('shop').get();
+    if (g.empty) {
+        res.json({
+            status: "fail",
+            text: "Error to get data!"
+        })
+    } else {
+        let all = g.docs.map(d => ({ id: d.id, ...d.data() }));
+        res.json({
+            status: "success",
+            text: "Shop was got.",
+            data: all
+        })
+    }
+})
+
+//add shop
+app.post('/add/shop', async (req, res) => {
+    let data = req.body;
+    if (data) {
+        await db.collection('shop')
+            .add({
+                name: data.name,
+                type: data.type,
+                photo:'',
+                about:data.about,
+                location:data.location,
+                addedtime: admin.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                res.json({
+                    status: "success",
+                    text: "Shop was added."
+                })
+            })
+    }
+})
+
+//update shop
+app.post('/update/shop', async (req, res) => {
+    let data = req.body;
+    if (data) {
+        await db.collection('shop').doc(data.id)
+            .update({
+                name: data.name,
+                type: data.type,
+                about: data.about,
+                location: data.location,
+            }).then(() => {
+                res.json({
+                    status: "success",
+                    text: "Shop was updated."
+                })
+            })
+    }
+})
+
 
 app.listen(80, () => {
     console.log('Server started with port 80');
