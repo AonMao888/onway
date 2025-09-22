@@ -103,6 +103,8 @@ app.post('/add/menu', async (req, res) => {
                 price: data.price,
                 photo: data.photo,
                 about:data.about,
+                shopname:data.shopname,
+                shopid:data.shopid,
                 addedtime: admin.firestore.FieldValue.serverTimestamp()
             }).then(() => {
                 res.json({
