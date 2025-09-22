@@ -11,6 +11,7 @@
     "start": "nodemon server.js"
   },
   "dependencies": {
+    "@imagekit/nodejs": "^7.0.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "expo-server-sdk": "^4.0.0",
