@@ -98,10 +98,7 @@ app.post('/add/menu', async (req, res) => {
     if (data) {
         await db.collection('menu')
             .add({
-                englishname: data.englishname,
-                chinaname: data.chinaname,
-                tainame: data.tainame,
-                myanname: data.myanname,
+                name: data.name,
                 type: data.type,
                 price: data.price,
                 photo: data.photo,
