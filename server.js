@@ -3,6 +3,7 @@ const express = require('express');
 var admin = require('firebase-admin');
 const cors = require('cors');
 const { Expo } = require('expo-server-sdk');
+const ImageKit = require("@imagekit/nodejs");
 
 const app = express();
 app.use(express.json());
@@ -31,6 +32,17 @@ admin.initializeApp({
 });
 const db = admin.firestore();
 
+const client = new ImageKit({
+    privateKey: process.env.IMAGEKIT_PRIVATE_KEY
+});
+
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
 function getdate(e) {
     let jsdate = e.toDate();
     const formattedDate = jsdate.toLocaleString('en-US', {
@@ -47,6 +59,13 @@ function getdate(e) {
 app.get('/', (req, res) => {
     res.send(process.env.HOMETEXT)
 })
+
+//get imagekit auth
+app.get('/imagekit/auth', (req, res) => {
+    const { token, expire, signature } = client.helper.getAuthenticationParameters();
+    res.json({ token, expire, signature, publicKey: process.env.IMAGEKIT_PUBLIC_KEY });
+})
+
 //get all shop
 app.get('/allshop', (req, res) => {
     res.json({
@@ -296,7 +315,7 @@ app.post('/driver/got/order', async (req, res) => {
         }).then(async () => {
             await db.collection('jobs').doc(data.jobid).update({
                 status: 'On going',
-                'orderdata.status':'On going'
+                'orderdata.status': 'On going'
             }).then(() => {
                 res.json({
                     status: "success",
@@ -730,7 +749,7 @@ app.post('/add/job', async (req, res) => {
                 };
                 try {
                     const response = await admin.messaging().send(message);
-                    res.json({ status: "success", text:"Job was sent to driver.", response });
+                    res.json({ status: "success", text: "Job was sent to driver.", response });
                 } catch (error) {
                     console.error(error);
                     res.status(500).json({ status: "error", text: error.message });
