@@ -121,13 +121,12 @@ app.post('/update/menu', async (req, res) => {
     if (data) {
         await db.collection('menu').doc(data.id)
             .update({
-                englishname: data.englishname,
-                chinaname: data.chinaname,
-                tainame: data.tainame,
-                myanname: data.myanname,
+                name: data.name,
                 type: data.type,
                 price: data.price,
-                photo: data.photo,
+                shopname:data.shopname,
+                shopid:data.shopid,
+                about:data.about
             }).then(() => {
                 res.json({
                     status: "success",
