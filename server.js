@@ -152,6 +152,7 @@ app.post('/add/order', async (req, res) => {
                 lat: data.lat,
                 long: data.long,
                 status: 'Received',
+                deliveryfee:data.deliveryfee,
                 discount: data.discount,
                 discountname: data.discountname,
                 discountcode: data.discountcode,
