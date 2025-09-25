@@ -1057,6 +1057,25 @@ app.get('/shop', async (req, res) => {
     }
 })
 
+//get specific shop data
+app.get('/shop/:id', async (req, res) => {
+    let { id } = req.params;
+    let got = await db.collection('shop').doc(id).get();
+    if (got.exists) {
+        let data = { id: got.id, addedtime: getdate(got.data().addtime), ...got.data() }
+        res.json({
+            status: "success",
+            text: "Shop found.",
+            data: data
+        })
+    } else {
+        res.json({
+            status: "fail",
+            text: "No shop found with this ID!"
+        })
+    }
+})
+
 //add shop
 app.post('/add/shop', async (req, res) => {
     let data = req.body;
