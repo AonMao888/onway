@@ -1084,7 +1084,8 @@ app.post('/add/shop', async (req, res) => {
             .add({
                 name: data.name,
                 type: data.type,
-                photo:data.photo,
+                profile:data.profile,
+                background:data.background,
                 address:data.address,
                 about:data.about,
                 location:data.location,
@@ -1108,6 +1109,9 @@ app.post('/update/shop', async (req, res) => {
                 type: data.type,
                 about: data.about,
                 location: data.location,
+                profile:data.profile,
+                background:data.background,
+                address:data.address
             }).then(() => {
                 res.json({
                     status: "success",
