@@ -1090,6 +1090,7 @@ app.post('/add/shop', async (req, res) => {
                 about:data.about,
                 location:data.location,
                 phone:data.phone,
+                email:data.email,
                 addedtime: admin.firestore.FieldValue.serverTimestamp()
             }).then(() => {
                 res.json({
@@ -1114,6 +1115,7 @@ app.post('/update/shop', async (req, res) => {
                 background:data.background,
                 address:data.address,
                 phone:data.phone,
+                email:data.email,
             }).then(() => {
                 res.json({
                     status: "success",
