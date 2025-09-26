@@ -1084,7 +1084,8 @@ app.post('/add/shop', async (req, res) => {
             .add({
                 name: data.name,
                 type: data.type,
-                photo:'',
+                photo:data.photo,
+                address:data.address,
                 about:data.about,
                 location:data.location,
                 addedtime: admin.firestore.FieldValue.serverTimestamp()
