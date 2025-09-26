@@ -1062,7 +1062,7 @@ app.get('/shop/:id', async (req, res) => {
     let { id } = req.params;
     let got = await db.collection('shop').doc(id).get();
     if (got.exists) {
-        let data = { id: got.id, addedtime: getdate(got.data().addtime), ...got.data() }
+        let data = { id: got.id, addtime: getdate(got.data().addedtime), ...got.data() }
         res.json({
             status: "success",
             text: "Shop found.",
