@@ -1164,6 +1164,45 @@ app.post('/add/ads', async (req, res) => {
     }
 })
 
+//update ads
+app.post('/update/ads', async (req, res) => {
+    let data = req.body;
+    if (data) {
+        await db.collection('ads').doc(data.id)
+            .update({
+                des:data.des,
+                shopname:data.shopname,
+                shopid:data.shopid,
+                expiry:data.expiry
+            }).then(() => {
+                res.json({
+                    status: "success",
+                    text: "Ads was updated."
+                })
+            })
+    }
+})
+
+//delete ads
+app.post('/delete/ads', async (req, res) => {
+    let data = req.body;
+    if (data) {
+        await db.collection('ads').doc(data.id)
+            .delete().then((e) => {
+                res.json({
+                    status: "success",
+                    text: "Ads was deleted.",
+                    id: e.id
+                })
+            }).catch(e => {
+                res.json({
+                    status: "fail",
+                    text: "Something went wrong to delete Ads!"
+                })
+            })
+    }
+})
+
 
 app.listen(80, () => {
     console.log('Server started with port 80');
