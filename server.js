@@ -1125,6 +1125,24 @@ app.post('/update/shop', async (req, res) => {
     }
 })
 
+//get all ads
+app.get('/ads', async (req, res) => {
+    let g = await db.collection('ads').get();
+    if (g.empty) {
+        res.json({
+            status: "fail",
+            text: "Error to get data!"
+        })
+    } else {
+        let all = g.docs.map(d => ({ id: d.id, ...d.data() }));
+        res.json({
+            status: "success",
+            text: "Ads was got.",
+            data: all
+        })
+    }
+})
+
 //add shop
 app.post('/add/ads', async (req, res) => {
     let data = req.body;
