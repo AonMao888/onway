@@ -1125,6 +1125,27 @@ app.post('/update/shop', async (req, res) => {
     }
 })
 
+//add shop
+app.post('/add/ads', async (req, res) => {
+    let data = req.body;
+    if (data) {
+        await db.collection('ads')
+            .add({
+                shopname: data.shopname,
+                shopid:data.shopid,
+                des:data.des,
+                expiry:data.expiry,
+                photo:data.photo,
+                addedtime: admin.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                res.json({
+                    status: "success",
+                    text: "Ads was added."
+                })
+            })
+    }
+})
+
 
 app.listen(80, () => {
     console.log('Server started with port 80');
