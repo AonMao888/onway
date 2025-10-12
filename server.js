@@ -76,7 +76,7 @@ app.get('/allshop', (req, res) => {
 
 //get all menu
 app.get('/menu', async (req, res) => {
-    let g = await db.collection('menu').get();
+    let g = await db.collection('menu').orderBy('addedtime', 'desc').get();
     if (g.empty) {
         res.json({
             status: "fail",
